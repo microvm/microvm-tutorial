@@ -6,14 +6,14 @@ The µVM project addresses the difficulties in implementing managed languages.
 They include languages that have a garbage collector and likely run on a virtual
 machine.
 
-What makes language implementation difficult?
+What Makes Language Implementation Difficult?
 =============================================
 
 We identify three major concerns that make language implementation difficult, 
 namely **concurrency**, **just-in-time compiling** and **garbage collection**.
 
-Not only each of them are difficult. When handling all three at the same time,
-their combined complexity will multiply.
+Each of them is already difficult enough individually. But when handling all
+three at the same time, their combined complexity will multiply.
 
     For example, in a multi-threaded JIT-compiled garbage-collected program,
     when GC is triggered, the GC thread needs to ask all mutator threads running
@@ -28,23 +28,26 @@ their combined complexity will multiply.
 Because they are difficult, language implementations either omit them or
 implement them naively.
 
-Take CPython, the official Python implementation, as an example:
+    Take CPython, the official Python implementation, as an example:
 
-+ *lack of concurrency*: There is a global interpreter lock (GIL) which is
-  obtained before every Python thread resumes. This makes the execution of all
-  multi-threaded Python programs sequential.
+    + *lack of concurrency*: In CPython, there is a `global interpreter lock
+      (GIL)
+      <https://docs.python.org/3.4/glossary.html#term-global-interpreter-lock>`__
+      which must be obtained for any Python thread to run. This makes the
+      execution of all multi-threaded Python programs sequential.
 
-+ *lack of JIT-compiling*: CPython is interpreter-only and does not perform
-  run-time optimisation based on JIT-compiling and type inference. A simple
-  computation-intensive program may be up to 20 times slower than an equivalent
-  C program. For comparison, PyPy, a Python implementation that does JIT-based
-  optimisation, can run as fast as unoptimised C (GCC with -O0) in some cases.
+    + *lack of JIT-compiling*: CPython is interpreter-only and does not perform
+      run-time optimisation based on JIT-compiling and type inference. A simple
+      computation-intensive program may be up to 20 times slower than an
+      equivalent C program. For comparison, PyPy, a Python implementation that
+      does JIT-based optimisation, can run as fast as unoptimised C (GCC with
+      -O0) in some cases.
 
-+ *naive garbage collector*: CPython uses a naive reference counting garbage
-  collector. It increment or decrement the count every time a reference is
-  created or destroyed. This naive algorithm is known to be `more than 30%
-  slower than a naive mark-sweep GC in execution time
-  <http://users.cecs.anu.edu.au/~steveb/downloads/pdf/rc-ismm-2012.pdf>`__
+    + *naive garbage collector*: CPython uses a naive reference counting garbage
+      collector. It increments or decrements the count every time a reference is
+      created or destroyed. This naive algorithm is known to be `more than 30%
+      slower than a naive mark-sweep GC in total execution time
+      <http://users.cecs.anu.edu.au/~steveb/downloads/pdf/rc-ismm-2012.pdf>`__.
 
 In reality, **many languages designs are implementation driven**. Difficulties
 in implementation will result in **bad decisions being baked into the design**
@@ -81,14 +84,14 @@ There are basically two ways to implement a managed language.
    Most don't address all three concerns, and no code is shared between those
    projects.
 
-2. Targeting an existing high-quality virtual machine, such as the JVM and the
-   .NET CLR. The problems are *semantic gaps* and *huge dependencies*. Existing
-   VMs are designed for particular kinds of languages. For example, the JVM is
-   designed for static object-oriented languages. Its built-in optimisations
-   does not work for dynamic languages like Python. `Jython
-   <http://www.jython.org/>`__, for example, still performs in the same order of
-   magnitude as CPython. Moreover, using JVM introduces many unnecessary
-   dependencies on Java-related packages.
+2. Targeting an existing virtual machine, such as the JVM or the .NET CLR, which
+   has high-quality implementations. The problems are *semantic gaps* and *huge
+   dependencies*. Existing VMs are designed for particular kinds of languages.
+   For example, the JVM is designed for static object-oriented languages.
+   Optimisations usually done by JVM do not work for dynamic languages like
+   Python.  `Jython <http://www.jython.org/>`__, for example, still performs in
+   the same order of magnitude as CPython. Moreover, using JVM introduces many
+   unnecessary dependencies on Java-related packages.
 
 Both approaches use **monolithic virtual machines**. Each such VM handles all
 aspects of the runtime of the language. For example, the JVM handles
@@ -100,11 +103,12 @@ for other languages.
 
 We propose an alternative concept: **micro virtual machines**. Analogous to
 *microkernels* in the operating system literature, a micro virtual machine only
-contains the parts that are absolutely necessary to run in the core of the VM.
-We suppose those parts are concurrency, JIT and GC. There is a separate program,
-called a **client**, sitting on the top of a micro virtual machine, interacting
-with the micro virtual machine and handling other (mostly language-specific)
-parts, in a similar fashion as *servers* interacting with the microkernel.
+contains the parts that are absolutely necessary to be handled in the core of
+the VM. We suppose those parts are concurrency, JIT and GC. There is a separate
+program, called a **client**, sitting on the top of a micro virtual machine,
+interacting with the micro virtual machine and handling other (mostly
+language-specific) parts, in a similar fashion as *servers* interacting with the
+microkernel.
 
 The micro virtual machine must be **low-level** and **minimal**.
 
