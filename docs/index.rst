@@ -17,6 +17,7 @@ top of the µVM.
     :numbered:
 
     langimpl/intro.rst
+    langimpl/getting-started.rst
 
 
 
