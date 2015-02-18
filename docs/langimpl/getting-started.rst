@@ -19,17 +19,18 @@ The current µVM reference implementation is written in Scala and runs on JVM
 <http://www.scala-lang.org/documentation/books.html>`__ provides useful
 resources and some books are freely available online.
 
-Getting the µVM
-===============
+Get the µVM
+===========
 
 Please follow the instructions in the `README
 <https://github.com/microvm/microvm-refimpl2/blob/master/README.md>`__ file in
 the ``microvm-refimpl2`` repository to install building tools, clone the
 repository and build it.
 
-It is recommended to use the ScalaIDE. It is the Eclipse IDE with Scala plugins
-pre-installed. If you use IntelliJ IDEA, you may notice that it rejects some
-correct Scala programs and accepts some Scala code with syntax/semantic errors.
+It is recommended to use `ScalaIDE <http://scala-ide.org/>`__. It is the Eclipse
+IDE with Scala plugins pre-installed. If you use IntelliJ IDEA, you may notice
+that it rejects some correct Scala programs and accepts some Scala code with
+syntax/semantic errors.
 
 The microvm-refimpl2 depends on Antlr4 to generate a parser. Make sure you
 follow the instructions in the README file to generate extra source files and
