@@ -115,17 +115,24 @@ The micro virtual machine must be **low-level** and **minimal**.
 * Being low-level means being close to the machine and thus minimise the
   semantic gap.
 
-* Being minimal reduces the space overhead, and gives concrete language
-  implementations flexibility. Being minimal also means the micro virtual
-  machine itself is easier to design and implement, making it practical to
-  create a formally verified VM.
+* Being minimal means it must push jobs that are not essential to the higher
+  level, that is, the client. This is a separation of concern.
+  
+  - The micro virtual machine itself will be easier to design and implement. The
+    minimalism also makes it practical to create a formally verified VM.
 
-The minimalism pushes as much job as possible to the client side. To make the
-concrete high-level language implementers happy, **libraries** can be provided
-to assist the implementation of certain kinds of languages, like dynamic
-languages, functional languages, object-oriented languages and so on. Libraries
-are *not* part of the micro virtual machine. They may become part of the client
-or come with code snippets.
+  - The client is not bound to the assumptions made by the low-level VM and can
+    implement the language with maximum flexibility. The client has more
+    responsibility, too, but it can still rely on the micro virtual machine for
+    the three major concerns that are extremely difficult.
+
+The minimalism pushes as much job as possible to the client side, potentially
+making the language implementer's job harder than targeting traditional VMs like
+JVM. To mitigate this limitation, **libraries** can be provided to assist the
+implementation of certain kinds of languages, like dynamic languages, functional
+languages, object-oriented languages and so on. Libraries are *not* part of the
+micro virtual machine. The library can be a framework or a package that is part
+of the client; it can also be pre-written code snippets.
 
 The **µVM** project (a.k.a. **MicroVM**) is a concrete micro virtual machine, in
 the same way `seL4 <http://sel4.systems/>`__ is a concrete microkernel.
