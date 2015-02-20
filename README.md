@@ -1,5 +1,7 @@
 This is a tutorial of the µVM.
 
+It is hosted on readthedocs.org. http://microvm-tutorial.readthedocs.org/en/latest/
+
 It is written in reStructuredText with Sphinx.
 
 To install sphinx: `pip3 install sphinx`.

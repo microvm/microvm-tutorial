@@ -18,6 +18,7 @@ top of the µVM.
 
     langimpl/intro.rst
     langimpl/getting-started.rst
+    langimpl/uvm-ir.rst
 
 
 
