@@ -19,5 +19,6 @@ top of the µVM.
     langimpl/intro.rst
     langimpl/getting-started.rst
     langimpl/interact.rst
+    langimpl/type-system.rst
 
 .. vim: tw=80
