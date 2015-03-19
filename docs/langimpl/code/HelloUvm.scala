@@ -3,9 +3,9 @@ package tutorial
 import uvm.refimpl._
 
 object HelloUvm extends App {
-  val microVM = new MicroVM()  // Create a µVM.
+  val microVM = new MicroVM()  // Create a Mu instance.
   
-  val ca = microVM.newClientAgent()  // Create a "client agent" to control the µVM.
+  val ca = microVM.newClientAgent()  // Create a "client agent" to control the micro VM.
   
   val reader1 = new java.io.FileReader("tests/uvm-refimpl-test/primitives.uir")
   ca.loadBundle(reader1)  // Load a bundle.

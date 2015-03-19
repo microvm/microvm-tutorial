@@ -2,9 +2,9 @@
 Introduction
 ============
 
-The µVM project addresses the difficulties in implementing managed languages.
-They include languages that have a garbage collector and likely run on a virtual
-machine.
+The Mu project addresses the difficulties in implementing managed languages,
+which include those languages that have a garbage collector and likely run on a
+virtual machine.
 
 What Makes Language Implementation Difficult?
 =============================================
@@ -110,7 +110,7 @@ interacting with the micro virtual machine and handling other (mostly
 language-specific) parts, in a similar fashion as *servers* interacting with the
 microkernel.
 
-The micro virtual machine must be **low-level** and **minimal**.
+A micro virtual machine must be **low-level** and **minimal**.
 
 * Being low-level means being close to the machine and thus minimise the
   semantic gap.
@@ -134,15 +134,15 @@ languages, object-oriented languages and so on. Libraries are *not* part of the
 micro virtual machine. The library can be a framework or a package that is part
 of the client; it can also be pre-written code snippets.
 
-The **µVM** project (a.k.a. **MicroVM**) is a concrete micro virtual machine, in
-the same way `seL4 <http://sel4.systems/>`__ is a concrete microkernel.
+The **Mu** project is a concrete micro virtual machine, in the same way `seL4
+<http://sel4.systems/>`__ is a concrete microkernel.
 
 Separating the Specification and the Implementation
 ===================================================
 
-The µVM has two parts: a `specification
+Mu has two parts: a `specification
 <https://github.com/microvm/microvm-spec/wiki>`__ which describes the behaviour
-and the interface of the µVM, and a `reference implementation
+and the interface of Mu, and a `reference implementation
 <https://github.com/microvm/microvm-refimpl2>`__.
 
 The specification makes it possible to create many different implementations for
@@ -151,10 +151,10 @@ high-performance implementation for productional use, an extensible modular
 implementation for researching, and a formally verified implementation for
 highly-assured applications.
 
-The goal of the reference implementation is to make a **simple** µVM
+The goal of the reference implementation is to make a **simple** Mu
 implementation and allow early evaluators to do experiment with the interface of
-the µVM. Since the µVM is still under heavy designing, the simplicity allows the
-µVM reference implementation to be agilely changed when the specification
-changes. It is **not** a high-performance implementation.
+Mu. Since Mu is still under heavy designing, the simplicity allows Mu reference
+implementation to be agilely changed when the specification changes. It is
+**not** a high-performance implementation.
 
 .. vim: tw=80

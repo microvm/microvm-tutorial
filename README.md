@@ -1,4 +1,4 @@
-This is a tutorial of the µVM.
+This is a tutorial of Mu, a micro virtual machine.
 
 It is hosted on readthedocs.org. http://microvm-tutorial.readthedocs.org/en/latest/
 

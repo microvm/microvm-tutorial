@@ -1,23 +1,23 @@
-========================
-Interacting With the µVM
-========================
+=======================
+Interacting With the Mu
+=======================
 
-The client interacts with the µVM in two ways: the *µVM IR* and the *µVM-client
-API*.
+The client interacts with Mu in two ways: the *Mu IR* and the *Mu client
+interface*.
 
-µVM Intermediate Representation
+Mu Intermediate Representation
 ===============================
 
-The code which µVM reads and executes is called the **µVM Intermediate
-Representation**, or **µVM IR** for short.
+The code which Mu reads and executes is called the **Mu Intermediate
+Representation**, or **Mu IR** for short.
 
-The µVM IR is `defined by the µVM specification
+The Mu IR is `defined by the Mu specification
 <https://github.com/microvm/microvm-spec/wiki/uvm-ir>`__.
 
-Example µVM IR code
--------------------
+Example Mu IR code
+------------------
 
-The unit of code delivery to the µVM is **bundle**.
+The unit of code delivery to Mu is **bundle**.
 
 Here is an example bundle in the text format: ``tests/tutorial/interact.uir``
 
@@ -38,21 +38,21 @@ name ``@i64`` to that type. Similarly, ``.typedef @void = void`` binds the name
     You can even bind more than one names to the "same" type. When referred to
     later, ``@void``, ``@just_another_void``, ``@still_void`` will not have any
     noticeable difference from the client's point of view. (Of course from the
-    µVM implementer's point of view they are somewhat different)
+    Mu implementer's point of view they are somewhat different)
 
 Similarly, ``.const``, ``.global``, ``.funcsig``, ``.funcdef``, ``.funcdecl``
 define constants, global cells, function signatures, functions and function
 versions, and also give them names.
 
-    Notes about the term "*function version*": Functions in the µVM may have
+    Notes about the term "*function version*": Functions in Mu may have
     multiple versions. They will be introduced later. For now, just remember
     that a function version is the body of a function. Every ``.funcdef``
     defines a "function version". 
 
-In the µVM IR, every **identified entity** must have an ID and optionally a
-name.  In the µVM, *types*, *function signatures*, *constants*, *global cells*,
-*functions*, *function versions*, *parameters*, *basic blocks* and
-*instructions* are identified entities.
+In the Mu IR, every **identified entity** must have an ID and optionally a name.
+In Mu, *types*, *function signatures*, *constants*, *global cells*, *functions*,
+*function versions*, *parameters*, *basic blocks* and *instructions* are
+identified entities.
 
 An ID is a 32-bit integer. ID is not used in the text form of the IR. It will be
 automatically assigned.
@@ -71,8 +71,8 @@ Inside a function definition, there are many basic blocks. The first block is
 the "entry block" and is conventionally named ``%entry``. Each basic block has
 many instructions.
 
-    If you worked with LLVM before, you may find it very familiar. Indeed the
-    µVM is inspired by the LLVM. It also uses the SSA form.
+    If you worked with LLVM before, you may find it very familiar. Indeed Mu is
+    inspired by the LLVM. It also uses the SSA form.
 
 Each instruction performs a certain computation. Consider the line:
 
@@ -90,37 +90,37 @@ The ``TRAP`` Instruction
 ------------------------
 
 One instruction needs special attention at this moment: the ``TRAP``
-instruction. From time to time, the program written in the µVM IR will need to
-handle events which the µVM cannot handle alone. The ``TRAP`` is like a special
-jump. It transfers the control from the µVM IR program to the client. A
-registered *trap handler* in the client will handle such an event.
+instruction. From time to time, the program written in the Mu IR will need to
+handle events which Mu cannot handle alone. The ``TRAP`` is like a special jump.
+It transfers the control from the Mu IR program to the client. A registered
+*trap handler* in the client will handle such an event.
 
-This is so far you need to know about the µVM IR.
+This is so far you need to know about Mu IR.
 
-    Exercise: Write a program and load the bundle above into a µVM instance.
+    Exercise: Write a program and load the bundle above into a Mu instance.
 
-µVM-client Interface
+Mu Client Interface
 ====================
 
-The client not only submits bundles to the µVM, but also directly controls the
-µVM directly via the **µVM-client interface**, which is also simply called **the
+The client not only submits bundles to Mu, but also directly controls Mu
+directly via the **Mu client interface**, which is also simply called **the
 API** if not ambiguous.
 
-The interface is two-way: the client can send messages to the µVM to manipulate
-its state; the µVM calls back to the client to handle events which the µVM
-cannot handle by itself (including the execution of a ``TRAP`` instruction). 
+The interface is two-way: the client can send messages to Mu to manipulate its
+state; Mu calls back to the client to handle events which Mu cannot handle by
+itself (including the execution of a ``TRAP`` instruction). 
 
 The specification defines the `messages in the API
 <https://github.com/microvm/microvm-spec/wiki/uvm-client-interface>`__.
 
-In the reference implementation, the µVM itself is represented by a
-``uvm.refimpl.MicroVM`` instance. Most messages are sent to the µVM via a
+In the reference implementation, Mu itself is represented by a
+``uvm.refimpl.MicroVM`` instance. Most messages are sent to Mu via a
 ``uvm.refimpl.ClientAgnet`` instance.
 
 Loading a Bundle
 ----------------
 
-In this example, we will create a µVM and a client agent:
+In this example, we will create a Mu instance and a client agent:
 
 .. code-block:: scala
 
@@ -130,7 +130,7 @@ In this example, we will create a µVM and a client agent:
     val ca = microVM.newClientAgent()
 
 Assume the above bundle is saved in ``tests/tutorial/interact.uir``. Let's load
-it into the µVM:
+it into Mu:
 
 .. code-block:: scala
 
@@ -139,29 +139,29 @@ it into the µVM:
     reader.close()
 
 The ``ca.loadBundle`` method takes a Java ``Reader`` and loads the bundle from
-it in the text form. Now the bundle is loaded into the µVM.
+it in the text form. Now the bundle is loaded into Mu.
 
-But nothing will happen because you did not tell the µVM to run anything.
+But nothing will happen because you did not tell Mu to run anything.
 
 Threads and Stacks
 ------------------
 
-In the µVM, a **thread** is an abstraction of a virtual processor that is
+In Mu, a **thread** is an abstraction of a virtual processor that is
 capable of executing code. It is the unit of scheduling and is *usually*
 implemented as one-to-one mapped to OS threads. In this reference
 implementation, however, threads are implemented as green threads, that is, one
-single Java thread executing instructions for multiple µVM threads, one
-instruction at a time, alternating between all µVM threads.
+single Java thread executing instructions for multiple Mu threads, one
+instruction at a time, alternating between all Mu threads.
 
-But a thread alone is not enough. It needs a context to execute on. In the µVM,
+But a thread alone is not enough. It needs a context to execute on. In Mu,
 a **stack** is the context in which a thread executes. A stack contains many
 **frames**, each of which contains the context of a function activation. A frame
 contains an instruction pointer to indicate which instruction is being executed,
 the value of all local variables in a function, and memory cells explicitly
 allocated on the stack.
 
-To execute a µVM function, the client should create a new µVM stack with a frame
-containing the context of the desired µVM function, and create a new µVM thread
+To execute a Mu function, the client should create a new Mu stack with a frame
+containing the context of the desired Mu function, and create a new Mu thread
 that binds to that stack. Then the thread keeps executing in the context of the
 stack until it hits a special instruction ``@uvm.thread_exit``.
 
@@ -173,10 +173,10 @@ stack until it hits a special instruction ``@uvm.thread_exit``.
     example POSIX threads, does allow the programmer to manually allocate the
     stack memory.
 
-    In the µVM, however, the relationship between a thread and a stack is not
-    fixed. A thread may unbind from a stack and rebind to another stack, making
-    it a kind of explicit light-weight context switching implemented within the
-    µVM. Traps also make use of the same mechanism to switch context from a µVM
+    In Mu, however, the relationship between a thread and a stack is not fixed.
+    A thread may unbind from a stack and rebind to another stack, making it a
+    kind of explicit light-weight context switching implemented within Mu.
+    Traps also make use of the same mechanism to switch context from a Mu
     program to the client. This will be discussed in greater depth in the
     future.
 
@@ -193,36 +193,35 @@ Now let's create a stack with the context of the ``@main`` function.
     val mainFunc   : Handle  = ca.putFunction(mainFuncID)
     val st         : Handle  = ca.newStack(mainFunc, Seq())
 
-Most µVM-client API messages use the ID to identify entities, because that is
+Most Mu-client API messages use the ID to identify entities, because that is
 what should be implemented in a realistic environment, in which the binary form
-µVM IR is used rather than the text form. The ``microVM.idOf`` method looks up
+Mu IR is used rather than the text form. The ``microVM.idOf`` method looks up
 the ID of a given name.
 
-A **handle** is an opaque representation of a µVM value held by the client
+A **handle** is an opaque representation of a Mu value held by the client
 agent. In this case, the ``ca.putFunction`` message asks the client agent to
-create a µVM value, which is function reference value referring to the ``@main``
+create a Mu value, which is function reference value referring to the ``@main``
 function. This value is held by the client agent ``ca``, and it is exposed to
 the client as the handle ``mainFunc``. Similarly the ``ca.newStack`` message
-tells the client agent to create a new µVM stack, with a frame for the main
-function with an empty argument list ``Seq()``. The returned value is a µVM
+tells the client agent to create a new Mu stack, with a frame for the main
+function with an empty argument list ``Seq()``. The returned value is a Mu
 stack reference, referring to the new stack, and it is exposed to the client as
 the handle ``st``.
 
-    There are two reasons why µVM exposes µVM values to the client via opaque
+    There are two reasons why Mu exposes Mu values to the client via opaque
     handles rather than raw values.
 
-    1. There is a gap between the type system of the µVM and the type system of
-       the language the client is written in. In this case, it is the µVM
-       type system and the Scala type system. The µVM may have types which
-       the client language cannot represent. For example, the µVM allows
-       integers of some weird lengths (for example, integers of 52 bits)
-       which is not supported by most languages.  If the client is written
-       in C, it does not have reference types. The µVM also has opaque types
-       which the representation is a detail of a particular µVM
-       implementation. This opaque approach bridges the gap between the two
-       type systems.
+    1. There is a gap between the type system of Mu and the type system of the
+       language the client is written in. In this case, it is the Mu type
+       system and the Scala type system. Mu may have types which the client
+       language cannot represent. For example, Mu allows integers of some
+       weird lengths (for example, integers of 52 bits) which is not
+       supported by most languages.  If the client is written in C, it does
+       not have reference types. Mu also has opaque types which the
+       representation is a detail of a particular Mu implementation. This
+       opaque approach bridges the gap between the two type systems.
 
-    2. The µVM needs to keep track of all references to the µVM heap in order to
+    2. Mu needs to keep track of all references to the Mu heap in order to
        perform exact garbage collection. This is trivial if all references
        exposed to the client are indirect handles via the client agent. For
        implementations which does not move objects, the handle can be the raw
@@ -240,14 +239,14 @@ version can be:
     val mainFunc = ca.putFunction("@main") // implicitly converting "@main" to its ID
     val st = ca.newStack(mainFunc, Seq())
 
-Then we create a µVM thread.
+Then we create a Mu thread.
 
 .. code-block:: scala
 
     val th = ca.newThread(st)
 
 As you may have guessed, the ``ca.newThread`` message tells the client agent to
-create a new µVM thread, using the stack ``st`` as its context, and return a
+create a new Mu thread, using the stack ``st`` as its context, and return a
 thread reference, exposing it to the client as the handle ``th``.
 
 Now the thread ``th`` will run on the stack ``st``. As you have created your
@@ -259,9 +258,9 @@ agent.
 
     ca.close()
 
-Unfortunately the program still does not run! That's because the current µVM
-reference implementation is single-threaded. You must tell the µVM to run itself
-in the current thread, that is, the "main thread", that is, the Java thread in
+Unfortunately the program still does not run! That's because the current Mu
+reference implementation is single-threaded. You must tell Mu to run itself in
+the current thread, that is, the "main thread", that is, the Java thread in
 which all code so far has run.
 
 .. code-block:: scala
@@ -273,14 +272,14 @@ Then it runs... until it throws an exception similar to this::
     Unhandled trap. Thread 1, funcver [65555:@main_v1], trap inst [65558:@main_v1.the_trap]
 
 That's normal. It actually ran, but when executing the ``TRAP`` instruction in
-the ``@main`` function, the µVM asks the client for help by attempting to call a
+the ``@main`` function, Mu asks the client for help by attempting to call a
 registered trap handler. But the default trap handler simply throws an
 exception when called.
 
 Trap Handler
 ------------
 
-Let's register a handler before letting the µVM run again.
+Let's register a handler before letting Mu run again.
 
 .. code-block:: scala
 
@@ -300,7 +299,7 @@ Let's register a handler before letting the µVM run again.
     
     microVM.trapManager.trapHandler = MyTrapHandler
 
-When the ``TRAP`` instruction is executed, the µVM temporarily unbinds the
+When the ``TRAP`` instruction is executed, Mu temporarily unbinds the
 thread from the stack, leaving the stack available for introspection. Pay
 attention to the ``KEEPALIVE`` clause in the ``TRAP`` instruction:
 
@@ -311,7 +310,7 @@ attention to the ``KEEPALIVE`` clause in the ``TRAP`` instruction:
 
     %the_trap = TRAP <@void> KEEPALIVE(%result)
     
-Consider that the code generator of a highly-optimising µVM implementation may
+Consider that the code generator of a highly-optimising Mu implementation may
 perform liveness analysis and discard the value of some variables if it is never
 used again (i.e. "dead" variables). Not all variables may be "live" when the
 ``TRAP`` instruction is executed, so their values may not always be available
@@ -326,12 +325,11 @@ client.
     Answer: Yes. First of all, it is the client that generated the function. The
     client has full knowledge about what is the purpose of the trap and which
     variable should be introspected. Being explicit simply makes things easier.
-    Secondly the client does not need to depend on how aggressively the µVM
-    optimises the code. Although the µVM is supposed to perform minimal work and
-    push much job to the client, the client still cannot assume how minimal the
-    µVM is.
+    Secondly the client does not need to depend on how aggressively Mu optimises
+    the code. Although Mu is supposed to perform minimal work and push much job
+    to the client, the client still cannot assume how minimal Mu is.
 
-Before entering the trap handler, the µVM already created a temporary client
+Before entering the trap handler, Mu already created a temporary client
 agent for the client, having the handles of the thread and the stack already
 available. These are provided by the parameters of the ``handleTrap`` method.
 You can temporarily ignore the ``watchPointID`` parameter for now. The client
@@ -339,9 +337,9 @@ agent will be automatically closed upon returning from the trap handler.
 
 The first thing the client should do is to test **which** ``TRAP`` instruction
 is executed because there may be more than one traps in the code in all the
-bundles the µVM has loaded. As stated before, *the name uniquely identifies an
+bundles Mu has loaded. As stated before, *the name uniquely identifies an
 entity*. We first use the ``ca.currentInstruction`` message to obtain the ID of
-the current instruction, which is the ``TRAP`` instruction. Then we let the µVM
+the current instruction, which is the ``TRAP`` instruction. Then we let Mu
 translate the ID to the textual name using the ``microVM.nameOf`` method. The
 name will be the *global name* (starting with ``@``, in the form of
 ``@func_ver_name.local_name``). Then we match the name against all names of
@@ -353,24 +351,24 @@ which returns a sequence of handles. This allows the client to introspect the
 value of the designated local variables, in this case it is only the ``%result``
 variable.  Since we know ``%result`` holds an integer value, we convert the
 handle to a Scala ``BigInt`` by ``ca.toInt`` and also tells it to sign-extend
-the µVM integer value because it is supposed to be signed. Then we print the
+the Mu integer value because it is supposed to be signed. Then we print the
 value using the good old ``printf`` method.
 
-    Note: In the µVM, an integer type only has length, but not signedness.
-    Concrete operations may treat an integer value as signed or unsigned. This
-    will be discussed later.
+    Note: In Mu, an integer type only has length, but not signedness.  Concrete
+    operations may treat an integer value as signed or unsigned. This will be
+    discussed later.
 
 The last thing to do before leaving the trap handler is to decide how the thread
 should continue. Killing the thread is a good idea here, but this time we choose
 to rebind the thread with the old stack. This is achieved by returning
 ``TrapRebindPassVoid(st)`` which rebinds the thread with the old stack ``st``.
 
-After returning from the trap handler, the µVM program continues from the
+After returning from the trap handler, the Mu program continues from the
 ``TRAP`` instruction and hits the "common instruction" ``@uvm.thread_exit``
 which stops the thread and automatically destroys the stack.
 
     Note: "Common instruction" is just a fancy name of all instructions that
-    follows a certain format. It is introduced to make the µVM IR extensible,
+    follows a certain format. It is introduced to make the Mu IR extensible,
     that is, it allows introducing new instructions without modifying the
     parser.
 
@@ -385,40 +383,40 @@ Run this program and you will see this line among other logs::
 
     The result is 6.
     
-In this way, the µVM program is executed and the result is printed to the
+In this way, the Mu program is executed and the result is printed to the
 console with the help of the client, that is, your Scala program.
 
 Recap
 =====
 
-The client interacts with the µVM in two ways: the **µVM IR** and **the API**.
+The client interacts with Mu in two ways: the **Mu IR** and **the API**.
 
-The µVM IR contains many top-level definitions. Specifically, in a function
+The Mu IR contains many top-level definitions. Specifically, in a function
 definition, it uses the same SSA form as LLVM, having multiple basic blocks each
 having many instructions.
 
-Every entity in the µVM IR is identified by an ID and optionally a name. The
+Every entity in the Mu IR is identified by an ID and optionally a name. The
 local name is just a shorthand of its global counterpart. Both IDs and names can
 uniquely identify an entity.
 
 The ``TRAP`` instruction is special. It transfers the control to the client for
-doing things the µVM cannot do alone.
+doing things Mu cannot do alone.
 
-The API allows the client to manipulate the state of the µVM, and also respond
-to traps.
+The API allows the client to manipulate the state of Mu, and also respond to
+traps.
 
-The µVM only exposes opaque handles to the client rather than raw values. It is
-for segregating the difference between the type system of the client and the
-µVM, and to facilitate exact garbage collection. However, simple values,
+Mu only exposes opaque handles to the client rather than raw values. It is
+for segregating the difference between the type system of the client and
+Mu, and to facilitate exact garbage collection. However, simple values,
 including integers, floating point numbers and vectors, can be converted to and
 from the client's native values in restricted ways.
 
-To start a µVM program, the client should create a stack with the context of a
+To start a Mu program, the client should create a stack with the context of a
 function, and a thread using the stack as its context. All of them are done with
 the help of a client agent.
 
 The trap handler gives the client a chance to introspect the state of the
-execution of a µVM thread. It can introspect the value of "keepalive" variables
+execution of a Mu thread. It can introspect the value of "keepalive" variables
 and decide how the thread should continue.
 
 .. vim: tw=80

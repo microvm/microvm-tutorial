@@ -1,16 +1,17 @@
-================
-MicroVM Tutorial
-================
+===========
+Mu Tutorial
+===========
 
-This tutorial is about the open-source MicroVM (a.k.a. µVM) Project
-(`<http://microvm.org/>`__), a minimalist virtual machine as an underlying
-substrate for high-level programming language implementations.
+This tutorial is about Mu, a micro virtual machine designed by `The Micro
+Virtual Machine Project <http://microvm.org/>`__. A micro virtual machine is a
+minimalist virtual machine as an underlying substrate for high-level programming
+language implementations.
 
 Language Implementor's Tutorial
 ===============================
 
 This part is suitable for those who wish to implement a programming language on
-top of the µVM.
+top of Mu.
 
 .. toctree::
     :maxdepth: 2
