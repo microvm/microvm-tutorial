@@ -312,7 +312,7 @@ attention to the ``KEEPALIVE`` clause in the ``TRAP`` instruction:
     
 Consider that the code generator of a highly-optimising Mu implementation may
 perform liveness analysis and discard the value of some variables if it is never
-used again (i.e. "dead" variables). Not all variables may be "live" when the
+used again (i.e. "dead" variables). Not all variables may be "alive" when the
 ``TRAP`` instruction is executed, so their values may not always be available
 for introspection. To solve this problem, all variables whose value are supposed
 to be introspected must be explicitly declared in the ``KEEPALIVE`` clause, and
@@ -320,9 +320,9 @@ exactly those variables in the ``KEEPALIVE`` clause can be introspected by the
 client.
 
     Question: Do I need to declare all variables? I am certain that some
-    variables must be live at the point of the trap.
+    variables must be alive at the point of the trap.
 
-    Answer: Yes. First of all, it is the client that generated the function. The
+    Answer: Yes. First of all, it was the client that generated the function. The
     client has full knowledge about what is the purpose of the trap and which
     variable should be introspected. Being explicit simply makes things easier.
     Secondly the client does not need to depend on how aggressively Mu optimises
