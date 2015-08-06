@@ -115,7 +115,7 @@ The specification defines the `messages in the API
 
 In the reference implementation, Mu itself is represented by a
 ``uvm.refimpl.MicroVM`` instance. Most messages are sent to Mu via a
-``uvm.refimpl.ClientAgnet`` instance.
+``uvm.refimpl.ClientAgent`` instance.
 
 Loading a Bundle
 ----------------
