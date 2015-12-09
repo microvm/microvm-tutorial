@@ -1,0 +1,13 @@
+===============================
+Mu Intermediate Representation
+===============================
+
+The code which Mu reads and executes is called the **Mu Intermediate
+Representation**, or **Mu IR** for short.
+
+The Mu IR is `defined by the Mu specification
+<https://github.com/microvm/microvm-spec/wiki/uvm-ir>`__.
+
+    TODO: Add up-to-date examples.
+
+.. vim: tw=80

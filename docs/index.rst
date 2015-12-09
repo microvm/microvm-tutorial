@@ -2,10 +2,11 @@
 Mu Tutorial
 ===========
 
-This tutorial is about Mu, a micro virtual machine designed by `The Micro
-Virtual Machine Project <http://microvm.org/>`__. A micro virtual machine is a
-minimalist virtual machine as an underlying substrate for high-level programming
-language implementations.
+This tutorial is about the `Mu micro virtual machine <http://microvm.org/>`__.
+
+A micro VM is a minimalist virtual machine as an underlying substrate for
+high-level programming language implementations. Mu is designed for languages
+that are concurrent, JIT compiled and use garbage collection.
 
 Language Implementor's Tutorial
 ===============================
@@ -20,6 +21,7 @@ top of Mu.
     langimpl/intro.rst
     langimpl/getting-started.rst
     langimpl/interact.rst
+    langimpl/ir.rst
     langimpl/type-system.rst
 
 .. vim: tw=80
