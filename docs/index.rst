@@ -1,6 +1,6 @@
-===========
-Mu Tutorial
-===========
+===============
+The Mu Micro VM
+===============
 
 This tutorial is about the `Mu micro virtual machine <http://microvm.org/>`__.
 
