@@ -19,10 +19,10 @@ heap. The default heap size is quite big, and is usually enough for experiment.
 Mu Contexts
 ===========
 
-The client more often interacts with the micro VM via "Mu context", or "MuCtx"
-in the spec or ``uvm.refimpl.MuCtx`` in the refimpl. A MuCtx is a context
-created from a MicroVM instance. It can hold Mu values for the client, access
-the Mu memory, load bundles and let the client perform many tasks on Mu.
+The client more often interacts with the micro VM via "Mu context". They are
+called "MuCtx" in the spec, and ``uvm.refimpl.MuCtx`` in the refimpl. A MuCtx is
+a context created from a MicroVM instance. It can hold Mu values for the client,
+access the Mu memory, load bundles and let the client perform many tasks on Mu.
 
 Why not directly do these things on the MicroVM instance? Why add another layer?
 There are two reasons.
@@ -92,12 +92,16 @@ Using Mu Contexts
 -----------------
 
 You can create a ``MuCtx`` instance by invoking the ``newContext()`` method on
-the ``MicroVM`` instance::
+the ``MicroVM`` instance:
+
+.. code-block:: scala
 
     val ctx = microVM.newContext()
 
 and you need to close the context in order to release the resources it is
-holding inside::
+holding inside:
+
+.. code-block:: scala
 
     ctx.closeContext()
 
