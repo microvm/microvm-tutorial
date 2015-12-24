@@ -206,7 +206,134 @@ sufficient run-time statistics are collected so that the client can optimise the
 program. Traps can also be used for lazy code loading, de-optimising
 speculatively generated code, and debugging.
 
-TODO: how to register trap handlers
+Scala API
+---------
+
+The trap handler is registered by the ``setTrapHandler`` method on the
+``MicroVM`` instance.
+
+.. code-block:: scala
+
+    microVM.setTrapHandler(theTrapHandler)
+
+The trap handler is an instance of the ``uvm.refimpl.TrapHandler`` trait.
+
+.. code-block:: scala
+
+    trait TrapHandler {
+      def handleTrap(ctx: MuCtx, thread: MuThreadRefValue, stack: MuStackRefValue, watchPointID: Int): TrapHandlerResult
+    }
+
+A new ``MuCtx`` instance is created for this particular trap event. It is passed
+to the trap handler as the first argument ``ctx``. The ``thread`` and the
+``stack`` argument are handles of the thread that executed the ``TRAP``, and the
+stack it was bound to, respectively. These two handles are held by ``ctx``.  The
+``watchPointID`` argument is about "watch points", which will be discussed
+later.
+
+You probably only need one trap handler per program, so it is recommended to
+register it after created the Mu instance.
+
+Inside the trap handler, you can use any API functions.
+
+The return value of the trap handler tells Mu "how the current thread should
+continue". There are three options:
+
+* Terminate the current thread.
+
+* Rebind the thread to a stack.
+
+  * When rebinding, pass some values to the top frame and let it continue
+    normally.
+
+  * When rebinding, raise an exception and continue exceptionally.
+
+When rebinding, the stack could be the previous stack, i.e. the ``stack``
+argument of the trap handler, or a totally different stack. In the former case,
+it will continue after the ``TRAP`` instruction. In the latter case, the trap
+handler swaps the thread to a different stack, so the thread will continue in a
+totally different context.
+
+The return type ``uvm.refimpl.TrapHandlerResult`` has several cases:
+
+.. code-block:: scala
+
+    abstract class TrapHandlerResult
+    object TrapHandlerResult {
+      case class ThreadExit() extends TrapHandlerResult
+      case class Rebind(newStack: MuStackRefValue, htr: HowToResume) extends TrapHandlerResult
+    }
+
+    abstract class HowToResume
+    object HowToResume {
+      case class PassValues(values: Seq[MuValue]) extends HowToResume
+      case class ThrowExc(exc: MuRefValue) extends HowToResume
+    }
+    
+So you can return one of the cases from the trap handler:
+
+.. code-block:: scala
+
+    // Just for convenience
+    import TrapHandlerResult._
+    import HowToResume._
+
+    // Terminate the thread.
+    return ThreadExit()
+
+    // Rebind to the old stack, pass some values and contunue normally
+    // Assume "stack" is the argument of the handleTrap method
+    val v1 = ctx.handleFrom......(...)
+    val v2 = ctx.handleFrom......(...)
+    val v3 = ctx.handleFrom......(...)
+    return Rebind(stack, PassValues(Seq(v1, v2, v3)))
+
+    // Rebind to the old stack, pass an empty list of values and contunue normally
+    // Assume "stack" is the argument of the handleTrap method
+    return Rebind(stack, PassValues(Seq()))
+
+    // Rebind to the old stack, throw an exception.
+    // Assume "stack" is the argument of the handleTrap method
+    // In Mu, an exception is just an object reference.
+    val e = ctx.newFixed(......)
+    return Rebind(stack, ThrowExc(e))
+
+    // Rebind to a different stack, passing 0 values.
+    val func = ctx.handleFromFunc(...)
+    val stack2 = ctx.newStack(func)
+    return Rebind(stack2, PassValues(Seq()))
+    
+C API
+-----
+
+In the C API, you should use ``mvm->set_trap_handler(mvm, handler, user_data)``
+to register the trap handler.
+
+The signature of the trap handler is a bit complicated:
+
+.. code-block:: c
+
+    typedef void (*MuTrapHandler)(MuCtx *ctx, MuThreadRefValue thread,
+        MuStackRefValue stack, int wpid, MuTrapHandlerResult *result,
+        MuStackRefValue *new_stack, MuValue **values, int *nvalues,
+        MuValuesFreer *freer, MuCPtr *freerdata, MuRefValue *exception,
+        MuCPtr userdata);
+
+.. ** This is a comment. Just to make the Vim syntax highlighter happy.
+
+The first four arguments ``ctx``, ``thread``, ``stack`` and ``wpid`` are the
+same as Scala. The next seven arguments ``result``, ``new_stack``, ``values``,
+``nvalues``, ``freer``, ``freedata`` and ``exception`` are output arguments.
+They allow the C program to encode the counterpart of ``TrapHandlerResult``.
+Since the client in C needs to pass an array of values to Mu, it also needs to
+tell Mu how to de-allocate that array because there is not a standard way to
+de-allocate C objects. The ``userdata`` is an arbitrary pointer the client
+provided when registering the trap handler. This allows the trap handler to
+depend on extra client-decided contexts, because C does not have closures.
+
+See the [Mu
+specification](https://github.com/microvm/microvm-spec/blob/master/uvm-client-interface.rest#trap-handling)
+for more information about trap handling in C.
 
 Working Example
 ===============
