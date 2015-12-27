@@ -338,7 +338,56 @@ for more information about trap handling in C.
 Working Example
 ===============
 
-TODO
+The following Scala program will create a Mu micro VM and execute a simple Mu IR
+program. You can ignore details of the Mu IR now (except the TRAP instruction),
+but instead focus on the interaction between the client, the Mu thread, and the
+trap handler.
+
+The order of execution is labelled from ``#1`` to ``#26``. 
+
+.. literalinclude:: code/Interact.scala
+   :language: scala
+   :emphasize-lines: 8,14,16,26,43,51,58,66
+   :linenos:
+
+There are some key steps:
+
+- ``#1`` and ``#3`` creates the Mu instance and a context, respectively.
+
+- ``#4`` loads the initial bundle using the MuCtx. You can directly embed the
+  text-form Mu IR in your source code.
+
+- ``#5`` registers the trap handler. This handler will handle all traps in the
+  future.
+
+- Using the MuCtx, ``#6-9`` creates a Mu thread from a given Mu function, whose
+  name happens to be ``@main``. "main" is not a special name. When creating the
+  thread, the initial argument, the 64-bit integer 42, is passed to the
+  ``@main`` function. At ``#10``, the MuCtx ``ctx`` is no longer useful and can
+  be closed.
+
+- Once created, the Mu thread can execute. But the reference implementation
+  needs to call the ``microVM.execute()`` method ``#11`` to execute all Mu
+  threads in the only Scala (JVM) thread.
+
+- During the execution of the Mu thread, it hits the trap at line ``#14``. The
+  control then transfers to the trap handler. Note that the ``KEEPALIVE`` clause
+  specifies which local variables are eligible for introspection. In this case,
+  it is only ``%n2``.
+
+- In the trap handler, the value of client-specified local variables (keep-alive
+  variables) are dumped at ``#18`` and printed. Since the previous ``ADD``
+  instruction ``#13`` adds one to the number, it should print "43" here.
+
+- Then at ``#20``, the trap handler re-binds the thread with the old stack,
+  passing an empty list of values back to the TRAP.
+
+- Then it continues from the Mu function after TRAP ``#14``. The ``thread_stop``
+  instruction at ``#21`` stops the Mu thread.
+
+- In the reference implementation, the ``execute()`` function at ``#11`` ends
+  when the last Mu thread stopped. Then the example program quits. The
+  specification does not specify how a Mu micro VM should end.
 
 Summary
 =======
