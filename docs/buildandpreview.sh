@@ -1,4 +1,4 @@
-if which -s sphinx-autobuild ; then
+if which sphinx-autobuild > /dev/null ; then
     echo "Using sphinx-autobuild in" $(which sphinx-autobuild)
     sphinx-build . _build && sphinx-autobuild . _build
 else
