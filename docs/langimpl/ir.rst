@@ -7,6 +7,9 @@ or **Mu IR** for short. The IR is the language in which programs are represented
 in the Mu micro VM. The Mu IR is defined by the `Mu specification
 <https://github.com/microvm/microvm-spec/wiki/uvm-ir>`__.
 
+Bundle
+======
+
 The client submits one **bundle** (a piece of Mu IR code) at a time to the Mu
 micro VM.
 
@@ -63,12 +66,18 @@ A bundle looks like this:
 
 If you have used LLVM before, the Mu IR is the counterpart of LLVM modules.
 
-You may have noticed that there are names for all entities. Global names start
-with ``@`` and local names start with ``%``. In fact, local names are just
-syntax sugars of some global names, that is, everything has a global name. This
-will be discussed later.
+Names
+=====
+
+You may have noticed that there are names for almost all entities. In the Mu IR,
+there are two kinds of names: global names and local names. Global names start
+with ``@`` and local names start with ``%``. The allowed characters in names are
+``[a-zA-Z0-9_.]``.
+
+In fact, local names are just syntax sugars of some global names, that is,
+anything that has a name has a global name. This will be discussed later.
 
 At this moment, you only need to know what a bundle may contain. Their details
-will be discussed in later chapters.
+will be discussed in the following chapters.
 
 .. vim: tw=80
