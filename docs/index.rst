@@ -23,5 +23,6 @@ top of Mu.
     langimpl/interact.rst
     langimpl/ir.rst
     langimpl/type-system.rst
+    langimpl/simple-funcs.rst
 
 .. vim: tw=80
