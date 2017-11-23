@@ -5,18 +5,18 @@ Getting Started
 Where is Everything?
 ====================
 
-The `specification <https://github.com/microvm/microvm-spec/wiki>`__ is the
-canonical source of information about the implementation-neutral parts of Mu.
+The `specification <https://gitlab.anu.edu.au/mu/mu-spec>`__ is the canonical
+source of information about the implementation-neutral parts of Mu.
 
-This tutorial will use the `reference implementation v2
-<https://github.com/microvm/microvm-refimpl2>`__. Keep in mind that it is not
+This tutorial will use `Holstein <https://gitlab.anu.edu.au/mu/mu-impl-ref2>`__,
+the current reference implementation. Keep in mind that it is not
 high-performance. It is interpreted and single-threaded, does excessive checking
 and is very slow.
 
 Get Mu
 ======
 
-Go to https://github.com/microvm/microvm-refimpl2/ and follow the README file.
+Go to https://gitlab.anu.edu.au/mu/mu-impl-ref2 and follow the README file.
 That repository also contains a sample factorial program compiled from an
 RPython client and a loader to run it. Read the README file.
 

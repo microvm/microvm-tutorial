@@ -3,15 +3,14 @@ Basic Interaction
 =================
 
 You are writing a Mu *client*, which controls the Mu micro VM via the `Mu client
-interface
-<https://github.com/microvm/microvm-spec/blob/master/uvm-client-interface.rest>`__,
-usually simply called "the API".
+interface <https://gitlab.anu.edu.au/mu/mu-spec/blob/master/api.rst>`__, usually
+simply called "the API".
 
 In Scala, the class ``uvm.refimpl.MicroVM``, which implements the ``MuVM``
 struct in the specification, represents a micro VM instance. You can start Mu by
 creating a ``MicroVM`` instance::
 
-    val microVM = new MicroVM()
+    val microVM = MicroVM()
 
 Just as simple as this. The instance also internally allocates memory for its
 heap. The default heap size is quite big, and is usually enough for experiment.
@@ -20,7 +19,7 @@ Mu Contexts
 ===========
 
 The client more often interacts with the micro VM via "Mu context". They are
-called "MuCtx" in the spec, and ``uvm.refimpl.MuCtx`` in the refimpl. A MuCtx is
+called "MuCtx" in the spec, and ``uvm.refimpl.MuCtx`` in Holstein. A MuCtx is
 a context created from a MicroVM instance. It can hold Mu values for the client,
 access the Mu memory, load bundles and let the client perform many tasks on Mu.
 
@@ -67,7 +66,7 @@ is inspired by the JNI. JNI uses opaque "handles" to refer to Java object, so
 does the Mu API. However, for performance reason, opaque handles are not the
 only way to expose garbage-collected Mu objects to *native* programs. Mu has a
 more efficient but unsafe `native interface
-<https://github.com/microvm/microvm-spec/blob/master/native-interface.rest>`__
+<https://gitlab.anu.edu.au/mu/mu-spec/blob/master/native-interface.rst>`__
 which supports "object pinning". That is an advanced topic.
 
 .. note::
@@ -105,37 +104,55 @@ holding inside:
 
     ctx.closeContext()
 
-The following code is an overview of what the client context can do. These API
-functions are defined by the `specification
-<https://github.com/microvm/microvm-spec/blob/master/uvm-client-interface.rest>`__,
-and the `scala binding
-<https://github.com/microvm/microvm-refimpl2/blob/master/src/main/scala/uvm/refimpl/clientInterface.scala>`__
-matches the spec. You don't need to understand all of them now, since they will
-be covered in more depth in later chapters.
+The API, i.e. the methods of ``MicroVM`` and ``MuCtx``, are defined by `the API
+chapter <https://gitlab.anu.edu.au/mu/mu-spec/blob/master/api.rst>`__ of the
+specification.  The `scala binding
+<https://gitlab.anu.edu.au/mu/mu-impl-ref2/blob/master/src/main/scala/uvm/refimpl/clientInterface.scala>`__
+matches the spec.
+
+Let's see what MuCtx can do.  You don't need to understand all of them now,
+since they will be covered in more depth in later chapters.
+
+Create contexts from ``MicroVM`` instance:
 
 .. code-block:: scala
 
-    val microVM = new MicroVM()
+    val microVM = MicroVM()
     val ctx = microVM.newContext()
 
-    // Mu context can load bundles.
+Holstein can load Mu bundles from the text form.  This method of loading bundle
+is deprecated in favour for the `IR building API
+<https://gitlab.anu.edu.au/mu/mu-spec/blob/master/irbuilder.rst>`__ which avoids
+the text-form IR parser.
+
+.. code-block:: scala
+
     ctx.loadBundle("""
         .typedef @i64 = int<64>
         // more Mu IR code here
     """)
 
-    // It can hold Mu values for the client. Mu values have a specific int size.
+``MuCtx`` can hold Mu values for the client. Mu values have a specific int size.
+
+.. code-block:: scala
+
     val handle1 = ctx.handleFromInt(0x123456789abcdef0L, 64)
     val handle2 = ctx.handleFromInt(0x12345678L, 32)
     val handle3 = ctx.handleFromInt(0x1234L, 16)
     val handle4 = ctx.handleFromDouble(3.14)
     val handle5 = ctx.handleFromPtr(ctx.idOf("@someType"), 0x7fff0000018L)
 
-    // It can allocate objects in the Mu heap.
-    // The handle is held in ctx so that GC can find all of them.
+It can allocate objects in the Mu heap.
+The handle is held in ctx so that GC can find all of them.
+
+.. code-block:: scala
+
     val handle6 = ctx.newFixed(ctx.idOf("@someType"))
     
-    // It can create stacks and threads
+It can create Mu stacks and Mu threads
+
+.. code-block:: scala
+
     val hFunc   = ctx.handleFromFunc(ctx.idOf("@some_function"))
     val hStack  = ctx.newStack(hFunc)
     val hArg0   = ....
@@ -143,18 +160,27 @@ be covered in more depth in later chapters.
     val hArg2   = ....
     val hThread = ctx.newThread(hFunc, PassValues(Seq(hArg0, hArg1, hArg2)))
 
-    // It can access the Mu memory
+It can access the Mu memory
+
+.. code-block:: scala
+
     val hObjRef = ctx.newFixed(ctx.idOf("@int_of_64_bits"))
     val hIRef   = ctx.getIRef(hObjRef)
     val hValue  = ctx.load(MemoryOrder.SEQ_CST, hIRef)
 
-    // It can introspect the stack states
+It can introspect the stack states
+
+.. code-block:: scala
+
     val hStack2 = .....
     val hCursor = ctx.newCursor(hStack2)
     val funcID  = ctx.curFunc(hCursor)          // function ID
     val hVars   = ctx.dumpKeepalives(hCursor)   // local variables
 
-    // It can modify the stack states
+It can modify the stack states (a.k.a. on-stack replacement, OSR)
+
+.. code-block:: scala
+
     ctx.nextFrame(hCursor)
     ctx.popFramesTo(hCursor)
     val hFunc2  = ctx.handleFromFunc(...)
@@ -197,7 +223,7 @@ the thread and the stack that caused the ``TRAP``.
 
 Using the API, the client can to introspect the execution state of each of its
 frames, see the values of local variables, and even replace existing frames with
-new frames for new functions (this is called on-stack replacement, or OSR).
+new frames for new functions (this is called *on-stack replacement*, or OSR).
 
 The trap handler is a great opportunity for the client to do many things. The
 clever placement of ``TRAP`` instructions and the implementation of the trap
@@ -331,9 +357,9 @@ de-allocate C objects. The ``userdata`` is an arbitrary pointer the client
 provided when registering the trap handler. This allows the trap handler to
 depend on extra client-decided contexts, because C does not have closures.
 
-See the [Mu
-specification](https://github.com/microvm/microvm-spec/blob/master/uvm-client-interface.rest#trap-handling)
-for more information about trap handling in C.
+See the `trap handling section
+<https://gitlab.anu.edu.au/mu/mu-spec/blob/master/api.rst#trap-handling>`__ of
+the Mu Specification for more information about trap handling in C.
 
 Working Example
 ===============

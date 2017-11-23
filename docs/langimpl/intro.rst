@@ -140,21 +140,28 @@ The **Mu** project is a concrete micro virtual machine, in the same way `seL4
 Separating the Specification and the Implementation
 ===================================================
 
-Mu has two parts: a `specification
-<https://github.com/microvm/microvm-spec/wiki>`__ which describes the behaviour
-and the interface of Mu, and a `reference implementation
-<https://github.com/microvm/microvm-refimpl2>`__.
+Mu separates its specification and its implementations, making it possible to
+create many different implementations for different purposes.  In theory, there
+may be a simple proof-of-concept implementation, a high-performance
+implementation for productional use, an extensible modular implementation for
+researching, a formally verified implementation for highly-assured
+applications, and so on.
 
-The specification makes it possible to create many different implementations for
-different purposes. There may be a simple proof-of-concept implementation, a
-high-performance implementation for productional use, an extensible modular
-implementation for researching, and a formally verified implementation for
-highly-assured applications.
+The `Mu specification <https://gitlab.anu.edu.au/mu/mu-spec>`__ defines the
+behaviour and the interface of Mu.
 
-The goal of the reference implementation is to make a **simple** Mu
-implementation and allow early evaluators to do experiment with the interface of
-Mu. Since Mu is still under heavy designing, the simplicity allows Mu reference
-implementation to be agilely changed when the specification changes. It is
-**not** a high-performance implementation.
+Currently, Mu has two implementations:
+
+- `Holstein <https://gitlab.anu.edu.au/mu/mu-impl-ref2>`__, the reference
+  implementation, is a **simple** Mu implementation and allow early evaluators
+  to do experiment with the interface of Mu.  The simplicity allows Mu reference
+  implementation to be agilely changed when the specification changes. It is
+  **not** a high-performance implementation.
+
+- `Zebu <https://gitlab.anu.edu.au/mu/mu-impl-fast/>`__, the fast
+  implementation, is developed from the first day to be **fast**.  It is written
+  in Rust, and has a optimizing compiler and a high-performance garbage
+  collector.  It is currently implemented as an ahead-of-time compiler.  Some
+  functionalities are still in development.
 
 .. vim: tw=80

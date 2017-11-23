@@ -3,8 +3,8 @@ Simple Functions
 ================
 
 The constant and function syntax is defined in the `Intermediate Representation
-<https://github.com/microvm/microvm-spec/blob/master/uvm-ir.rest>`__ chapter of
-the specification.
+<https://gitlab.anu.edu.au/mu/mu-spec/blob/master/ir.rst>`__ chapter of the
+specification.
 
 The Mu IR uses a variant of the `static single assignment (SSA)
 <https://en.wikipedia.org/wiki/Static_single_assignment_form>`__ or `static

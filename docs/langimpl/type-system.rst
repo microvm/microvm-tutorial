@@ -3,7 +3,7 @@ Type System
 ===========
 
 The Mu type system is defined in `the specification
-<https://github.com/microvm/microvm-spec/blob/master/type-system.rest>`__.
+<https://gitlab.anu.edu.au/mu/mu-spec/blob/master/type-system.rst>`__.
 
 Like many programming languages and frameworks, Mu also has a type system.
 
@@ -32,10 +32,10 @@ The types in the Mu type system can be put into several categories:
    ``ufuncptr<sig>``. These types represent plain values.
 
 2. Scalar reference types: ``ref<T>``, ``iref<T>``, ``weakref<T>``,
-   ``funcref<sig>``, ``threadref``, ``stackref``, ``framecursorref`` and
-   ``tagref64``. These types refer to "things" in the Mu micro VM. All such
-   references are opaque in the sense that their representation is
-   implementation dependent.
+   ``funcref<sig>``, ``threadref``, ``stackref``, ``framecursorref``,
+   ``irbuilderref`` and ``tagref64``. These types refer to "things" in the Mu
+   micro VM. All such references are opaque in the sense that their
+   representation is implementation dependent.
 
 3. Composite types: ``struct<F1 F2 ...>``, ``array<T n>``, ``hybrid<F1 F2 ...
    V>`` and ``vector<T n>``. These types combine simpler types into more complex
@@ -83,6 +83,7 @@ To define a type in Mu, you use the top-level type definition: ``.typedef``.
     .typedef @stkref    = stackref
     .typedef @thrref    = threadref
     .typedef @fcref     = framecursorref
+    .typedef @ibref     = irbuilderref
 
     .typedef @struct1 = struct<@i32 @i32 @i32>
     .typedef @struct2 = struct<@i64 @double>
@@ -132,7 +133,7 @@ or ``new StringBuilder()`` before. Similarly you define a concrete instance of
 
 When types or function signatures are taken as argument, their names (such as
 ``@i32``, ``@float`` and ``@void``, not ``int<32>``, ``float`` or ``void``) are
-used. So the following is **wrong**:
+used. So the following are not accepted by Holstein:
 
 .. code-block:: uir
 
@@ -156,9 +157,21 @@ But these are right:
 
 .. note::
 
-    So why does Mu force all types to be "constructed" at the top level? For
-    consistency. This greatly simplifies the syntax of the Mu IR and the amount
-    of work the micro VM needs to do.
+    So why does Mu force all types to be "constructed" at the top level? Well,
+    that's what Holstein accepts now.  There are `alternative text Mu IR parsers
+    <https://gitlab.anu.edu.au/mu/mu-tool-compiler>`__ that accept in-line types
+    such as ``ref<int<32>>``.
+
+    Actually, productional Mu and client implementations will use the `IR
+    building API
+    <https://gitlab.anu.edu.au/mu/mu-spec/blob/master/irbuilder.rst>`__.  It
+    will skip the text parsing phase completely.
+
+    The reason why Holstein was designed like that was to let the text match the
+    actual data structure of the IR.  In the IR building API, each type is a
+    "node".  Types that have parameters (such as ``ref<T>``) refer to other
+    nodes by their IDs.  Similarly, in the text form, such type constructors
+    refer to other types by names.
 
     If you have used LLVM before, you may find that you can write types
     "directly", "inline", in the LLVM IR, such as:
@@ -190,15 +203,10 @@ But these are right:
     types. So this API is more similar to having to define (or, at least, make
     pointers to) the types separately.
 
-    On the other hand, there is only 18 types in the Mu type system, among which
+    On the other hand, there is only 19 types in the Mu type system, among which
     only 6 do not take arguments. Even if the client programmer has to define
     each and every types, all common types can be defined in about 20 lines as
     :ref:`above <types-examples>`, and his/her pain ends there.
-
-    The Mu micro VM team is considering allowing the client to construct and
-    load the Mu IR in language-specific and implementation-specific ways. In
-    that case, the API would be more similar to the LLVM C++ API, which is even
-    less likely to allow the "inline" syntax.
 
 Function signature definition
 -----------------------------
@@ -254,8 +262,9 @@ Details
 =======
 
 This section will only discuss the most important types. For more details, you
-can read `the specification
-<https://github.com/microvm/microvm-spec/blob/master/type-system.rest>`__.
+can read the `Type System section
+<https://gitlab.anu.edu.au/mu/mu-spec/blob/master/type-system.rst>`__ of the
+specification.
 
 Integer and FP types
 --------------------
@@ -308,9 +317,9 @@ field of a heap object is a memory location.
 
     "Memory location" does not mean "address". Do not assume a Mu heap object or
     any other memory locations have addresses. This is very important in Mu.
-    This will discussed in details in later chapters. The `specification
-    <https://github.com/microvm/microvm-spec/blob/master/uvm-memory.rest#basic-concepts>`__
-    contains some explanation.
+    This will discussed in details in later chapters. The specification contains
+    `some explanation
+    <https://gitlab.anu.edu.au/mu/mu-spec/blob/master/memory.rst#basic-concepts>`__
 
 Both ``ref`` and ``iref`` may be ``NULL``.
 

@@ -1,6 +1,6 @@
 This is a tutorial of Mu, a micro virtual machine.
 
-It is hosted on readthedocs.org. http://microvm-tutorial.readthedocs.org/en/latest/
+It is hosted on readthedocs.org. http://mu-tutorial.readthedocs.io/
 
 It is written in reStructuredText with Sphinx.
 

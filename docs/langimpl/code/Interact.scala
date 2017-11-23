@@ -5,7 +5,7 @@ import uvm.refimpl._
 object Interact extends App {
   
   // Create the Mu instance
-  val microVM = new MicroVM()     // #1
+  val microVM = MicroVM()     // #1
   
   // Implicitly convert names to IDs
   implicit def idOf(name: String) = microVM.idOf(name)  // #2
@@ -63,7 +63,7 @@ object Interact extends App {
   
   val fortyTwo = ctx.handleFromInt(42, 64)        // #8
   
-  val th = ctx.newThread(st, HowToResume.PassValues(Seq(fortyTwo)))  // #9
+  val th = ctx.newThread(st, None, HowToResume.PassValues(Seq(fortyTwo)))  // #9
   
   // Close the context
   ctx.closeContext()    // #10
@@ -73,3 +73,4 @@ object Interact extends App {
   
   // #22
 }
+

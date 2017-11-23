@@ -4,8 +4,15 @@ Mu Intermediate Representation
 
 The client generates code in the format of **Mu Intermediate Representation**,
 or **Mu IR** for short. The IR is the language in which programs are represented
-in the Mu micro VM. The Mu IR is defined by the `Mu specification
-<https://github.com/microvm/microvm-spec/wiki/uvm-ir>`__.
+in the Mu micro VM. The Mu IR is defined by the `Mu IR chapter
+<https://gitlab.anu.edu.au/mu/mu-spec/blob/master/ir.rst>`__ of the Mu
+specification.
+
+The structure of the Mu IR is an AST.  Mu bundle has a text form for human
+readability.  A bundle can also be built using the `IR building API
+<https://gitlab.anu.edu.au/mu/mu-spec/blob/master/irbuilder.rst>`__ which calls
+into Mu to build an AST inside Mu.  The IR building API is designed for
+productional setting.  This tutorial will use the text-form API.
 
 Bundle
 ======
